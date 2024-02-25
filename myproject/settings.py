@@ -53,10 +53,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:5173/uploadData",  # Adjust this to match your React app's origin
+    # Adjust this to match your React app's origin
     "http://localhost:5173",
-    # "http://localhost:5173",
     "http://127.0.0.1:8000"
+
     # Add other allowed origins as needed
 ]
 CORS_ALLOW_ALL_ORIGINS = True 
@@ -131,7 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

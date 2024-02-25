@@ -18,7 +18,7 @@ def handleDBUpload(request):
         uploaded_file = request.FILES['csvFile']
         df = pd.read_csv(uploaded_file)
         df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
-        print("Recived Dataframe goes like this \n",df.tail())
+        # print("Recived Dataframe goes like this \n",df.tail())
         for index, row in df.iterrows():
             if row['SYMBOL'] == '':
                 continue
@@ -41,5 +41,35 @@ def handleDBUpload(request):
         response = {"result": "Saved to DB"}
         return JsonResponse(response)
     else:
+        print(request.FILES['csvFile'])
+        response = {'error': 'Invalid request'}
+        return JsonResponse(response, status=400)
+    
+
+@csrf_exempt
+def handlegetData(request):
+    # print("up")
+    if request.method == 'GET':
+            # print("here")
+            try:
+                data = StockFuturesModel.objects.all()
+                serialized_data = [{'SYMBOL': item.SYMBOL,
+                                    'OPEN': item.OPEN,
+                                    'HIGH': item.HIGH,
+                                    'CLOSE': item.CLOSE,
+                                    'VOLUME': item.VOLUME,
+                                    'OPEN_INT': item.OPEN_INT,
+                                    'CHG_IN_OI': item.CHG_IN_OI,
+                                    'TIMESTAMP': item.TIMESTAMP,
+
+                                    } for item in data]
+                # print(serialized_data)
+                # list {[{} , {} ]}
+                return JsonResponse(serialized_data , safe=False)
+            except IntegrityError as e:
+                print("Error occurred while saving row to db", e)
+
+    else:
+        print(request.FILES['csvFile'])
         response = {'error': 'Invalid request'}
         return JsonResponse(response, status=400)

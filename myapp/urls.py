@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     
     path('uploadData/', views.handleDBUpload),
+    path('getdata/', views.handlegetData)
 
 ]
