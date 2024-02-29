@@ -10,6 +10,8 @@ from django.http import HttpResponse, JsonResponse
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
+import sqlite3
+import json
 
 @csrf_exempt
 def handleDBUpload(request):
@@ -41,34 +43,33 @@ def handleDBUpload(request):
         response = {"result": "Saved to DB"}
         return JsonResponse(response)
     else:
-        print(request.FILES['csvFile'])
+        # print(request.FILES['csvFile'])
         response = {'error': 'Invalid request'}
         return JsonResponse(response, status=400)
     
-
 @csrf_exempt
 def handlegetData(request):
     # print("up")
     if request.method == 'GET':
             # print("here")
             try:
-                data = StockFuturesModel.objects.all()
-                serialized_data = [{'SYMBOL': item.SYMBOL,
-                                    'OPEN': item.OPEN,
-                                    'HIGH': item.HIGH,
-                                    'CLOSE': item.CLOSE,
-                                    'VOLUME': item.VOLUME,
-                                    'OPEN_INT': item.OPEN_INT,
-                                    'CHG_IN_OI': item.CHG_IN_OI,
-                                    'TIMESTAMP': item.TIMESTAMP,
-
-                                    } for item in data]
-                # print(serialized_data)
-                # list {[{} , {} ]}
-                return JsonResponse(serialized_data , safe=False)
+                database_path = r'C:\Users\siddi\Desktop\testApp\myproject\db.sqlite3'
+                # Connect to the SQLite database
+                conn = sqlite3.connect(database_path)
+                # print("Connection Successful")
+                # Query data from the database
+                df = pd.read_sql_query("SELECT * FROM myapp_stockfuturesmodel", conn)
+                # print(df)
+                # Convert the DataFrame to a list of dictionaries
+                data = json.loads(df.to_json(orient='records'))
+                # print(data)
+                # Close the database connection
+                conn.close()
+                # Return the data as a JSON response
+                return JsonResponse(data, safe=False)
+                
             except IntegrityError as e:
                 print("Error occurred while saving row to db", e)
-
     else:
         print(request.FILES['csvFile'])
         response = {'error': 'Invalid request'}
